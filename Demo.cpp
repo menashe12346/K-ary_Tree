@@ -1,14 +1,12 @@
-/**
- * Demo app for Ex4
- */
 #include <iostream>
 #include <string>
 #include "Tree.hpp"
 
 using namespace std;
 
-int main()
-{
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
     Node<double> root_node = Node<double>(1.1);
     Tree<double> tree; // Binary tree that contains doubles.
     tree.add_root(root_node);
@@ -93,8 +91,10 @@ int main()
     cout << endl;
     // same as BFS: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
 
-    cout << tree; // Should print the graph using GUI.
+    std::cout << tree << std::endl;
 
+    return app.exec();
+    
     Tree<double, 3> three_ary_tree; // 3-ary tree.
     three_ary_tree.add_root(root_node);
     three_ary_tree.add_sub_node(root_node, n1);

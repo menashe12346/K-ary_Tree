@@ -213,30 +213,32 @@ tree.printTreeGUI();
 return os;
     }
 
-    void printTreeGUI() const {
-        if (!root) return;
-        
-        QGraphicsScene scene;
-        QGraphicsView view(&scene);
+void printTreeGUI() const {
+    if (!root) return;
 
-        std::queue<std::pair<TreeNode*, QPointF>> nodes;
-        nodes.push({root, QPointF(0, 0)});
+    QGraphicsScene* scene = new QGraphicsScene();
+    QGraphicsView* view = new QGraphicsView(scene);
 
-        while (!nodes.empty()) {
-            auto [node, pos] = nodes.front();
-            nodes.pop();
+    std::queue<std::pair<TreeNode*, QPointF>> nodes;
+    nodes.push({root, QPointF(0, 0)});
 
-            QGraphicsTextItem* item = scene.addText(QString::number(node->data.get_value()));
-            item->setPos(pos);
+    while (!nodes.empty()) {
+        auto [node, pos] = nodes.front();
+        nodes.pop();
 
-            float offset = 50.0; // adjust the offset as needed
-            for (size_t i = 0; i < node->children.size(); ++i) {
-                nodes.push({node->children[i], QPointF(pos.x() + (i - node->children.size() / 2) * offset, pos.y() + 50)});
-            }
+        QGraphicsTextItem* item = scene->addText(QString::number(node->data.get_value()));
+        item->setPos(pos);
+
+        float offset = 50.0; // adjust the offset as needed
+        for (size_t i = 0; i < node->children.size(); ++i) {
+            nodes.push({node->children[i], QPointF(pos.x() + (i - node->children.size() / 2) * offset, pos.y() + 50)});
         }
-
-        view.show();
     }
+
+    view->show();
+    QCoreApplication::exec(); // Start the Qt event loop
+}
+
 
 private:
     void clear(TreeNode* node) {

@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++11 -Wall -Wextra -fPIC
+CXXFLAGS = -std=c++11 -Wall -Wextra -fPIC -g
 
 # Qt includes and libraries
 QT_INCLUDES = $(shell pkg-config --cflags Qt5Widgets)

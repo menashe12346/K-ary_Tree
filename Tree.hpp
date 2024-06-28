@@ -13,6 +13,8 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsLineItem>
 
+using namespace std;
+
 /// A generic k-ary tree class with various traversal methods and GUI printing.
 template <typename T, int K = 2>
 class Tree {
@@ -53,7 +55,7 @@ public:
         }
     }
 
-    /// Pre-order traversal iterator.
+    /// Pre-order traversal iterator. dfs output = pre_order output here
     class PreOrderIterator {
         std::stack<TreeNode*> nodes;
     public:
@@ -91,35 +93,55 @@ public:
         return PreOrderIterator(nullptr);
     }
 
-    /// Post-order traversal iterator.
+    /// Post-order traversal iterator. run dfs if non binary
     class PostOrderIterator {
         std::stack<TreeNode*> nodes;
         std::stack<TreeNode*> output;
     public:
         PostOrderIterator(TreeNode* root) {
-            if (root) {
-                nodes.push(root);
-                while (!nodes.empty()) {
-                    TreeNode* node = nodes.top();
-                    nodes.pop();
-                    output.push(node);
-                    for (auto child : node->children) {
-                        nodes.push(child);
+            if(K==2){
+                if (root) {
+                    nodes.push(root);
+                    while (!nodes.empty()) {
+                        TreeNode* node = nodes.top();
+                        nodes.pop();
+                        output.push(node);
+                        for (auto child : node->children) {
+                            nodes.push(child);
+                        }
                     }
                 }
+            } else{
+                if (root) nodes.push(root);
             }
         }
 
         bool operator!=(const PostOrderIterator& other) const {
+            if(K==2){
             return !output.empty();
+            } else {
+                return !nodes.empty();
+            }
         }
 
         Node<T>& operator*() const {
-            return output.top()->data;
+            if(K==2){
+                return output.top()->data;
+            } else {
+                return nodes.top()->data;
+            }
         }
 
         PostOrderIterator& operator++() {
-            output.pop();
+            if(K==2){
+                output.pop();
+            }else{
+                TreeNode* node = nodes.top();
+                nodes.pop();
+                for (auto it = node->children.rbegin(); it != node->children.rend(); ++it) {
+                nodes.push(*it);
+                }
+            }
             return *this;
         }
     };
@@ -136,39 +158,59 @@ public:
         return PostOrderIterator(nullptr);
     }
 
-    /// In-order traversal iterator.
+    /// In-order traversal iterator. run dsf if non binary
     class InOrderIterator {
         std::stack<TreeNode*> nodes;
         TreeNode* current;
     public:
         InOrderIterator(TreeNode* root) : current(root) {
-            while (current && !current->children.empty()) {
-                nodes.push(current);
-                current = current->children.front();
-            }
-        }
-
-        bool operator!=(const InOrderIterator& other) const {
-            return current != nullptr;
-        }
-
-        Node<T>& operator*() const {
-            return current->data;
-        }
-
-        InOrderIterator& operator++() {
-            if (current->children.size() > 1) {
-                current = current->children[1];
+            if(K==2){
                 while (current && !current->children.empty()) {
                     nodes.push(current);
                     current = current->children.front();
                 }
+            } else{
+                if (root) nodes.push(root);
+            }
+        }
+
+        bool operator!=(const InOrderIterator& other) const {
+            if(K ==2){
+                return current != nullptr;
+            } else{
+                return !nodes.empty();
+            }
+        }
+
+        Node<T>& operator*() const {
+            if(K==2){
+                return current->data;
             } else {
-                if (nodes.empty()) {
-                    current = nullptr;
+                return nodes.top()->data;
+            }
+        }
+
+        InOrderIterator& operator++() {
+            if(K==2){
+                if (current->children.size() > 1) {
+                    current = current->children[1];
+                    while (current && !current->children.empty()) {
+                        nodes.push(current);
+                        current = current->children.front();
+                    }
                 } else {
-                    current = nodes.top();
-                    nodes.pop();
+                    if (nodes.empty()) {
+                        current = nullptr;
+                    } else {
+                        current = nodes.top();
+                        nodes.pop();
+                    }
+                }
+            }else{
+                TreeNode* node = nodes.top();
+                nodes.pop();
+                for (auto it = node->children.rbegin(); it != node->children.rend(); ++it) {
+                nodes.push(*it);
                 }
             }
             return *this;
@@ -283,8 +325,9 @@ public:
         HeapIterator(TreeNode* root) : index(0) {
             if (root) {
                 toHeap(root);
-                std::make_heap(heap.begin(), heap.end(), std::greater<Node<T>>());
-                std::sort_heap(heap.begin(), heap.end(), std::greater<Node<T>>());
+                // std::greater<Node<T>>: A comparison function that ensures a min-heap is created.
+                std::make_heap(heap.begin(), heap.end(), std::less<Node<T>>()); // organize the elements in the heap vector into a heap structure
+                std::sort_heap(heap.begin(), heap.end(), std::less<Node<T>>()); // To sort the elements of the heap in ascending order.
             }
         }
 
@@ -301,7 +344,6 @@ public:
             return *this;
         }
 
-    private:
         /// Convert the tree to a heap.
         /// @param node The root node of the subtree to convert.
         void toHeap(TreeNode* node) {
@@ -326,17 +368,34 @@ public:
         return HeapIterator(nullptr);
     }
 
+    /// Convert the tree to a vector of nodes.
+    /// @param node The root node of the subtree to convert.
+    /// @param nodes The vector to store the nodes.
+    void toHeapVector(TreeNode* node, std::vector<TreeNode*>& nodes) {
+        if (node) {
+            nodes.push_back(node);
+            for (auto child : node->children) {
+                toHeapVector(child, nodes);
+            }
+        }
+    }
+
     /// Convert the tree into a heap structure.
     void myHeap() {
+        // If the tree is empty, return immediately.
         if (!root) return;
 
+        // Create a vector to store nodes.
         std::vector<TreeNode*> nodes;
+        // Populate the vector with nodes from the tree.
         toHeapVector(root, nodes);
 
+        // Sort the nodes in ascending order based on their values.
         std::sort(nodes.begin(), nodes.end(), [](TreeNode* a, TreeNode* b) {
             return a->data < b->data;
         });
 
+        // Clear the children of each node and reassign them according to heap order.
         for (size_t i = 0; i < nodes.size(); ++i) {
             nodes[i]->children.clear();
             if (2 * i + 1 < nodes.size()) {
@@ -347,9 +406,10 @@ public:
             }
         }
 
+        // Set the first element of the sorted vector as the new root of the tree.
         root = nodes[0];
     }
-
+    
     /// Print the tree using a GUI.
     /// @param os The output stream to print to.
     /// @param tree The tree to print.
@@ -366,7 +426,7 @@ public:
         // Start drawing the tree from the top middle of the screen
         int startX = 750; // Adjust this based on your screen width
         int startY = 0;  // Start from the top
-        int hGap = 200;   // Horizontal gap between nodes
+        int hGap = 200 * (K-1);   // Horizontal gap between nodes
         int vGap = 100;   // Vertical gap between levels
 
         drawNode(scene, root, startX, startY, hGap, vGap);
@@ -450,17 +510,48 @@ private:
         rectItem->setPos(x - rect.width() / 2 - 25, y - rect.height() / 2 - 10); // Adjust position to align with text item
         textItem->setPos(x - textItem->boundingRect().width() / 2, y - textItem->boundingRect().height() / 2);
 
-        int childX = x - screen_padding - rect.width() - hGap * (node->children.size() - 1) / 2; // Adjust starting position
         int childY = y + vGap; // Adjust vertical gap
 
+            // Calculate the starting x position for children
+    int numChildren = node->children.size();
+    int childXLow=0;
+    int childXHigh=x - screen_padding + hGap;
+    if (numChildren > 0) {
+        int totalWidth;
+        if(numChildren%2!=0){
+            totalWidth = ((numChildren-1) * hGap) / 2; // so i wont count the one on the middle
+        } else{
+            totalWidth = (numChildren * hGap) / 2;
+        }
+                cout<< "totalWidth: " << totalWidth <<endl;
+
+        childXLow = x - totalWidth - screen_padding;
+    }
+
+    cout<< "childX: " << childXLow <<endl;
+    int numOfChild = 0;
         for (TreeNode* child : node->children) {
             if (child) {
-                // Use the edge color for the line
-                scene.addLine(x - screen_padding - rect.width() / 2, y + rect.height() / 2,
-                              childX , childY - rect.height() / 2, QPen(edgeColor, 2));
-                drawNode(scene, child, childX, childY, hGap, vGap, depth + 1);
-                childX += hGap;
+                if(numOfChild < numChildren/2){
+                    // Use the edge color for the line
+                    scene.addLine(x - screen_padding - rect.width() / 2, y + rect.height() / 2,
+                                childXLow - rect.width() * 2.25 , childY - rect.height() / 2 - screen_padding, QPen(edgeColor, 2));
+                    drawNode(scene, child, childXLow, childY, hGap - 100, vGap, depth + 1);
+                    childXLow += hGap;
+                } else if(numOfChild >= numChildren/2){
+                    if(!(numChildren%2!=0 && numOfChild == numChildren/2) || numChildren==1){// if the node in the middle
+                        scene.addLine(x - screen_padding - rect.width() / 2, y + rect.height() / 2,
+                        childXHigh + rect.width()/2, childY - rect.height() / 2 - screen_padding, QPen(edgeColor, 2));
+                        drawNode(scene, child, childXHigh  ,childY, hGap - 1, vGap, depth + 1);
+                    childXHigh += hGap;
+                    } else{
+                        scene.addLine(x - screen_padding - rect.width() / 2, y + rect.height() / 2,
+                                    x - screen_padding - rect.width() / 2 , childY - rect.height() / 2 - screen_padding, QPen(edgeColor, 2));
+                        drawNode(scene, child, x, childY, hGap - 150, vGap, depth + 1);
+                    }
+                }
             }
+            numOfChild++;
         }
     }
 };

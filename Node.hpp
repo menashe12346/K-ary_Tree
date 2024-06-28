@@ -42,6 +42,41 @@ public:
     bool operator==(const Node& other) const {
         return value == other.value;
     }
+
+    /// Inequality operator to compare two nodes.
+    /// @param other The other node to compare with.
+    /// @return True if the nodes have different values, false otherwise.
+    bool operator!=(const Node& other) const {
+        return value != other.value;
+    }
+
+    /// Less-than operator to compare two nodes.
+    /// @param other The other node to compare with.
+    /// @return True if this node's value is less than the other node's value.
+    bool operator<(const Node& other) const {
+        return value < other.value;
+    }
+
+    /// Greater-than operator to compare two nodes.
+    /// @param other The other node to compare with.
+    /// @return True if this node's value is greater than the other node's value.
+    bool operator>(const Node& other) const {
+        return value > other.value;
+    }
+
+    /// Less-than or equal-to operator to compare two nodes.
+    /// @param other The other node to compare with.
+    /// @return True if this node's value is less than or equal to the other node's value.
+    bool operator<=(const Node& other) const {
+        return value <= other.value;
+    }
+
+    /// Greater-than or equal-to operator to compare two nodes.
+    /// @param other The other node to compare with.
+    /// @return True if this node's value is greater than or equal to the other node's value.
+    bool operator>=(const Node& other) const {
+        return value >= other.value;
+    }
 };
 
 #endif // NODE_HPP

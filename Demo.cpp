@@ -5,7 +5,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    
+
     // initializes a Qt application
     QApplication app(argc, argv);
 
@@ -102,9 +102,6 @@ int main(int argc, char *argv[]) {
     three_ary_tree.add_sub_node(root_node, n3);
     three_ary_tree.add_sub_node(n1, n4);
     three_ary_tree.add_sub_node(n2, n5);
-
-        std::cout << three_ary_tree;
-
 
     // The tree should look like:
     /**

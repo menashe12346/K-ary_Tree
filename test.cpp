@@ -44,6 +44,28 @@ Tree<double, 3> createSampleThreeAryTree() {
     return tree;
 }
 
+// Function to create a sample binary tree with Complex nodes
+Tree<Complex> createSampleComplexTree() {
+    Complex root_value(34.7, 0.0);
+    Node<Complex> root_node(root_value);
+    Tree<Complex> tree;
+    tree.add_root(root_node);
+
+    Node<Complex> n1(Complex(45.9, 0.0));
+    Node<Complex> n2(Complex(56.8, 0.0));
+    Node<Complex> n3(Complex(78.2, 0.0));
+    Node<Complex> n4(Complex(89.1, 0.0));
+    Node<Complex> n5(Complex(100.5, 0.0));
+
+    tree.add_sub_node(root_node, n1);
+    tree.add_sub_node(root_node, n2);
+    tree.add_sub_node(n1, n3);
+    tree.add_sub_node(n1, n4);
+    tree.add_sub_node(n2, n5);
+
+    return tree;
+}
+
 TEST_CASE("Testing Pre-Order Iterator") {
     Tree<double> tree = createSampleBinaryTree();
 
@@ -97,7 +119,7 @@ TEST_CASE("Testing DFS Iterator") {
 
     std::vector<double> expected = {34.7, 45.9, 78.2, 89.1, 56.8, 100.5};
     std::vector<double> result;
-    for (auto node = tree.begin_dfs(); node != tree.end_dfs(); ++node) {
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node) {
         result.push_back((*node).get_value());
     }
 
@@ -125,7 +147,7 @@ TEST_CASE("Testing 3-Ary Tree DFS, In-Order, Post-Order, Pre-Order Iterators") {
     std::vector<double> result3;
     std::vector<double> result4;
 
-    for (auto node = tree.begin_dfs(); node != tree.end_dfs(); ++node) {
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node) {
         result1.push_back((*node).get_value());
     }
 
@@ -175,5 +197,78 @@ TEST_CASE("Testing myHeap Function") {
     }
 
     // Check that the result matches the expected values
+    CHECK(result == expected);
+}
+
+
+TEST_CASE("Testing Pre-Order Iterator with Complex") {
+    Tree<Complex> tree = createSampleComplexTree();
+
+    std::vector<Complex> expected = {Complex(34.7, 0.0), Complex(45.9, 0.0), Complex(78.2, 0.0), Complex(89.1, 0.0), Complex(56.8, 0.0), Complex(100.5, 0.0)};
+    std::vector<Complex> result;
+    for (auto node = tree.begin_pre_order(); node != tree.end_pre_order(); ++node) {
+        result.push_back((*node).get_value());
+    }
+
+    CHECK(result == expected);
+}
+
+TEST_CASE("Testing Post-Order Iterator with Complex") {
+    Tree<Complex> tree = createSampleComplexTree();
+
+    std::vector<Complex> expected = {Complex(78.2, 0.0), Complex(89.1, 0.0), Complex(45.9, 0.0), Complex(100.5, 0.0), Complex(56.8, 0.0), Complex(34.7, 0.0)};
+    std::vector<Complex> result;
+    for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node) {
+        result.push_back((*node).get_value());
+    }
+
+    CHECK(result == expected);
+}
+
+TEST_CASE("Testing In-Order Iterator with Complex") {
+    Tree<Complex> tree = createSampleComplexTree();
+
+    std::vector<Complex> expected = {Complex(78.2, 0.0), Complex(45.9, 0.0), Complex(89.1, 0.0), Complex(34.7, 0.0), Complex(100.5, 0.0), Complex(56.8, 0.0)};
+    std::vector<Complex> result;
+    for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node) {
+        result.push_back((*node).get_value());
+    }
+
+    CHECK(result == expected);
+}
+
+TEST_CASE("Testing BFS Iterator with Complex") {
+    Tree<Complex> tree = createSampleComplexTree();
+
+    std::vector<Complex> expected = {Complex(34.7, 0.0), Complex(45.9, 0.0), Complex(56.8, 0.0), Complex(78.2, 0.0), Complex(89.1, 0.0), Complex(100.5, 0.0)};
+    std::vector<Complex> result;
+    for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node) {
+        result.push_back((*node).get_value());
+    }
+
+    CHECK(result == expected);
+}
+
+TEST_CASE("Testing DFS Iterator with Complex") {
+    Tree<Complex> tree = createSampleComplexTree();
+
+    std::vector<Complex> expected = {Complex(34.7, 0.0), Complex(45.9, 0.0), Complex(78.2, 0.0), Complex(89.1, 0.0), Complex(56.8, 0.0), Complex(100.5, 0.0)};
+    std::vector<Complex> result;
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node) {
+        result.push_back((*node).get_value());
+    }
+
+    CHECK(result == expected);
+}
+
+TEST_CASE("Testing Heap Iterator with Complex") {
+    Tree<Complex> tree = createSampleComplexTree();
+
+    std::vector<Complex> expected = {Complex(34.7, 0.0), Complex(45.9, 0.0), Complex(56.8, 0.0), Complex(78.2, 0.0), Complex(89.1, 0.0), Complex(100.5, 0.0)}; // Assuming min-heap
+    std::vector<Complex> result;
+    for (auto node = tree.begin_heap(); node != tree.end_heap(); ++node) {
+        result.push_back((*node).get_value());
+    }
+
     CHECK(result == expected);
 }

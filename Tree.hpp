@@ -2,6 +2,7 @@
 #define TREE_HPP
 
 #include "Node.hpp"
+#include "Complex.hpp"
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -63,7 +64,9 @@ public:
             if (root) nodes.push(root);
         }
 
+        // using this only to check inequality with the PreOrderIterator(nullptr)
         bool operator!=(const PreOrderIterator& other) const {
+            (void)other; // Explicitly mark as unused
             return !nodes.empty();
         }
 
@@ -115,8 +118,9 @@ public:
                 if (root) nodes.push(root);
             }
         }
-
+        // using this only to check inequality with the PreOrderIterator(nullptr)
         bool operator!=(const PostOrderIterator& other) const {
+            (void)other; // Explicitly mark as unused
             if(K==2){
             return !output.empty();
             } else {
@@ -174,7 +178,9 @@ public:
             }
         }
 
+        // using this only to check inequality with the PreOrderIterator(nullptr)
         bool operator!=(const InOrderIterator& other) const {
+            (void)other; // Explicitly mark as unused
             if(K ==2){
                 return current != nullptr;
             } else{
@@ -237,7 +243,9 @@ public:
             if (root) nodes.push(root);
         }
 
+        // using this only to check inequality with the PreOrderIterator(nullptr)
         bool operator!=(const BFSIterator& other) const {
+            (void)other; // Explicitly mark as unused
             return !nodes.empty();
         }
 
@@ -287,7 +295,9 @@ public:
             if (root) nodes.push(root);
         }
 
+        // using this only to check inequality with the PreOrderIterator(nullptr)
         bool operator!=(const DFSIterator& other) const {
+            (void)other; // Explicitly mark as unused
             return !nodes.empty();
         }
 
@@ -307,13 +317,13 @@ public:
 
     /// Begin DFS traversal.
     /// @return DFSIterator at the start.
-    DFSIterator begin_dfs() {
+    DFSIterator begin_dfs_scan() {
         return DFSIterator(root);
     }
 
     /// End DFS traversal.
     /// @return DFSIterator at the end.
-    DFSIterator end_dfs() {
+    DFSIterator end_dfs_scan() {
         return DFSIterator(nullptr);
     }
 
@@ -331,7 +341,9 @@ public:
             }
         }
 
+        // using this only to check inequality with the PreOrderIterator(nullptr)
         bool operator!=(const HeapIterator& other) const {
+            (void)other; // Explicitly mark as unused
             return index != heap.size();
         }
 
@@ -543,7 +555,7 @@ private:
                 if(numOfChild < numChildren/2 || K == 1){
                     // Use the edge color for the line
                     scene.addLine(x - screen_padding - rect.width() / 2, y + rect.height() / 2,
-                                childXLow - rect.width() * 2.25 , childY - rect.height() / 2 - screen_padding, QPen(edgeColor, 2));
+                                childXLow - rect.width()  , childY - rect.height() / 2 - screen_padding, QPen(edgeColor, 2));
                     drawNode(scene, child, childXLow, childY, hGap - hGap/3, vGap, depth + 1);
                     childXLow += hGap;
                 } else if(numOfChild >= numChildren/2){

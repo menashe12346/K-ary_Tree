@@ -5,6 +5,8 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
+    
+    // initializes a Qt application
     QApplication app(argc, argv);
 
     Node<double> root_node = Node<double>(1.1);
@@ -113,5 +115,11 @@ int main(int argc, char *argv[]) {
      *  1.5      1.6
      */
 
+    
+    /*
+     starts the Qt event loop, which processes events like user interactions, updates, and window management. 
+     This loop runs continuously, keeping the application responsive until it is closed. 
+     It returns an exit code when the application terminates, which can be used for debugging or handling application shutdown procedures.
+    */
     return app.exec();
 }

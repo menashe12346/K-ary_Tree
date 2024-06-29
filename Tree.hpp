@@ -380,34 +380,38 @@ public:
         }
     }
 
-    /// Convert the tree into a heap structure.
+    /// Convert a binary tree into a heap structure.
     void myHeap() {
-        // If the tree is empty, return immediately.
-        if (!root) return;
+        if(K==2){
+            // If the tree is empty, return immediately.
+            if (!root) return;
 
-        // Create a vector to store nodes.
-        std::vector<TreeNode*> nodes;
-        // Populate the vector with nodes from the tree.
-        toHeapVector(root, nodes);
+            // Create a vector to store nodes.
+            std::vector<TreeNode*> nodes;
+            // Populate the vector with nodes from the tree.
+            toHeapVector(root, nodes);
 
-        // Sort the nodes in ascending order based on their values.
-        std::sort(nodes.begin(), nodes.end(), [](TreeNode* a, TreeNode* b) {
-            return a->data < b->data;
-        });
+            // Sort the nodes in ascending order based on their values.
+            std::sort(nodes.begin(), nodes.end(), [](TreeNode* a, TreeNode* b) {
+                return a->data < b->data;
+            });
 
-        // Clear the children of each node and reassign them according to heap order.
-        for (size_t i = 0; i < nodes.size(); ++i) {
-            nodes[i]->children.clear();
-            if (2 * i + 1 < nodes.size()) {
-                nodes[i]->children.push_back(nodes[2 * i + 1]);
+            // Clear the children of each node and reassign them according to heap order.
+            for (size_t i = 0; i < nodes.size(); ++i) {
+                nodes[i]->children.clear();
+                if (2 * i + 1 < nodes.size()) {
+                    nodes[i]->children.push_back(nodes[2 * i + 1]);
+                }
+                if (2 * i + 2 < nodes.size()) {
+                    nodes[i]->children.push_back(nodes[2 * i + 2]);
+                }
             }
-            if (2 * i + 2 < nodes.size()) {
-                nodes[i]->children.push_back(nodes[2 * i + 2]);
-            }
+
+            // Set the first element of the sorted vector as the new root of the tree.
+            root = nodes[0];
+        }else{
+            cout<< "tree is not binary"<< endl;
         }
-
-        // Set the first element of the sorted vector as the new root of the tree.
-        root = nodes[0];
     }
     
     /// Print the tree using a GUI.
@@ -425,29 +429,39 @@ public:
 
         // Start drawing the tree from the top middle of the screen
         int startX = 750; // Adjust this based on your screen width
-        int startY = 0;  // Start from the top
-        int hGap = 200 * (K-1);   // Horizontal gap between nodes
-        int vGap = 100;   // Vertical gap between levels
+        int startY = 50;  // Start slightly from the top for better visibility
+        int hGap = 200 * (K - 1); // Horizontal gap between nodes
+        int vGap = 100; // Vertical gap between levels
 
         drawNode(scene, root, startX, startY, hGap, vGap);
 
         // Create a view to visualize the scene
         QGraphicsView view(&scene);
+        // Enable antialiasing for smoother rendering of graphics.
         view.setRenderHint(QPainter::Antialiasing);
+
+        // Set the viewport update mode to optimize performance for larger scenes.
         view.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-        view.setBackgroundBrush(QColor(43, 43, 43)); // Set the background color to dark gray
-        view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Tree Visualization"));
 
-        // Set the size of the view
-        view.setFixedSize(1600, 900); // Width x Height
-        scene.setSceneRect(0, 0, 1500, 800); // Set the scene rectangle to match the view size
+        // Set a gradient background for a more professional look.
+        QLinearGradient gradient(0, 0, 0, 800);
+        gradient.setColorAt(0, QColor(60, 60, 60)); // Darker gray at the top.
+        gradient.setColorAt(1, QColor(30, 30, 30)); // Even darker gray at the bottom.
+        view.setBackgroundBrush(gradient);
 
+        // Set the window title for the graphics view.
+        view.setWindowTitle("Tree Visualization");
+
+        // Define the fixed size of the view window.
+        view.setFixedSize(1600, 900);
+        scene.setSceneRect(0, 0, 1500, 800); // Set the scene's rectangle size to match the view.
+
+        // Display the view.
         view.show();
 
-        // Start the Qt event loop
+        // Start the Qt event loop to handle user interaction and updates.
         QApplication::exec();
     }
-
 private:
     /// Clear the tree recursively.
     /// @param node The node to clear.
@@ -495,65 +509,59 @@ private:
         QColor borderColor, edgeColor;
         edgeColor = borderColor = QColor(29, 35, 189);
 
-        int leftPadding = 25;
-        int rightPadding = 25;
-        int topPadding = 10;
-        int bottomPadding = 10;
-
-        int screen_padding = 10;
-        int screen_side_padding = 30;
-
         // Add a rectangle around the text item with the determined border color and set background color
         QRectF rect = textItem->boundingRect();
         QColor backgroundColor(85, 85, 90); // Set the background color to match the provided image (dark gray)
         QGraphicsRectItem* rectItem = scene.addRect(rect.adjusted(-25, -10, 25, 10), QPen(borderColor, 2), QBrush(backgroundColor));
         rectItem->setPos(x - rect.width() / 2 - 25, y - rect.height() / 2 - 10); // Adjust position to align with text item
-        textItem->setPos(x - textItem->boundingRect().width() / 2, y - textItem->boundingRect().height() / 2);
+        // Calculate the rectangle's center position
+        int rectCenterX = x - rect.width() / 2 - 25;
+        int rectCenterY = y - rect.height() / 2 - 10;
+        // Set the position of the text item to be in the center of the rectangle
+        textItem->setPos(rectCenterX + rect.width() / 2 - textItem->boundingRect().width() / 2,
+                        rectCenterY + rect.height() / 2 - textItem->boundingRect().height() / 2);
 
+        int screen_padding = 10;
         int childY = y + vGap; // Adjust vertical gap
-
-            // Calculate the starting x position for children
-    int numChildren = node->children.size();
-    int childXLow=0;
-    int childXHigh=x - screen_padding + hGap;
-    if (numChildren > 0) {
-        int totalWidth;
-        if(numChildren%2!=0){
-            totalWidth = ((numChildren-1) * hGap) / 2; // so i wont count the one on the middle
-        } else{
-            totalWidth = (numChildren * hGap) / 2;
+        int numChildren = node->children.size();
+        int childXLow=0; // for left nodes
+        int childXHigh=x - screen_padding + hGap; // for right nodes
+        if (numChildren > 0) {
+            int totalWidth;
+            if(numChildren%2!=0){ // if num of children is odd
+                totalWidth = ((numChildren-1) * hGap) / 2; // so i wont count the one on the middle
+            } else{
+                totalWidth = (numChildren * hGap) / 2;
+            }
+            childXLow = x - totalWidth - screen_padding;
         }
-                cout<< "totalWidth: " << totalWidth <<endl;
 
-        childXLow = x - totalWidth - screen_padding;
-    }
-
-    cout<< "childX: " << childXLow <<endl;
-    int numOfChild = 0;
-        for (TreeNode* child : node->children) {
+        int numOfChild = 0;
+        for (TreeNode* child : node->children) 
+        {
             if (child) {
-                if(numOfChild < numChildren/2){
+                if(numOfChild < numChildren/2 || K == 1){
                     // Use the edge color for the line
                     scene.addLine(x - screen_padding - rect.width() / 2, y + rect.height() / 2,
                                 childXLow - rect.width() * 2.25 , childY - rect.height() / 2 - screen_padding, QPen(edgeColor, 2));
-                    drawNode(scene, child, childXLow, childY, hGap - 100, vGap, depth + 1);
+                    drawNode(scene, child, childXLow, childY, hGap - hGap/3, vGap, depth + 1);
                     childXLow += hGap;
                 } else if(numOfChild >= numChildren/2){
                     if(!(numChildren%2!=0 && numOfChild == numChildren/2) || numChildren==1){// if the node in the middle
                         scene.addLine(x - screen_padding - rect.width() / 2, y + rect.height() / 2,
                         childXHigh + rect.width()/2, childY - rect.height() / 2 - screen_padding, QPen(edgeColor, 2));
-                        drawNode(scene, child, childXHigh  ,childY, hGap - 1, vGap, depth + 1);
+                        drawNode(scene, child, childXHigh  ,childY, hGap - hGap/3 , vGap, depth + 1);
                     childXHigh += hGap;
                     } else{
                         scene.addLine(x - screen_padding - rect.width() / 2, y + rect.height() / 2,
                                     x - screen_padding - rect.width() / 2 , childY - rect.height() / 2 - screen_padding, QPen(edgeColor, 2));
-                        drawNode(scene, child, x, childY, hGap - 150, vGap, depth + 1);
+                        drawNode(scene, child, x, childY, hGap - hGap/3, vGap, depth + 1);
                     }
                 }
             }
-            numOfChild++;
+        numOfChild++;
         }
     }
 };
 
-#endif // TREE_HPP
+#endif

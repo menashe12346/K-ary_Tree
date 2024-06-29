@@ -16,7 +16,7 @@ TEST_TARGET = test
 # Source files
 SRCS = Demo.cpp
 COMPLEX_SRCS = main_complex.cpp Complex.cpp
-TEST_SRCS = test.cpp
+TEST_SRCS = test.cpp Complex.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

@@ -52,4 +52,4 @@ The k-ary tree container provides a flexible way to represent hierarchical data 
 Comprehensive tests are included to validate the functionality of the tree container and its iterators. Ensure that all tests pass before using the container in production.
 
 ## Contact 📧
-For any queries, please contact [menashe7676@example.com].
+For any queries, please contact [menashe7676@gmail.com].
